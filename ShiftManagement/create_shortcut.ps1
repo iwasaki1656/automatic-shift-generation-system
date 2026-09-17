@@ -33,10 +33,9 @@ if (-not $sdkList -or $sdkList.Count -eq 0) {
     # ブラウザを開く
     Start-Process "https://dotnet.microsoft.com/download/dotnet/9.0"
 
-    Write-Host "インストール完了後、もう一度このバッチファイルを実行してください。" -ForegroundColor Green
+    Write-Host "インストール完了後、もう一度このスクリプトを実行してください。" -ForegroundColor Green
     Write-Host ""
-    Write-Host "何かキーを押すと終了します..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    Read-Host "Enterキーを押すと終了します..."
     exit 1
 }
 
@@ -56,8 +55,7 @@ $projectPath = Join-Path $scriptDir "src\ShiftManagement.App\ShiftManagement.App
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "【エラー】ビルドまたは発行に失敗しました。" -ForegroundColor Red
-    Write-Host "何かキーを押すと終了します..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    Read-Host "Enterキーを押すと終了します..."
     exit 1
 }
 
