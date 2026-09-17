@@ -1,0 +1,130 @@
+<UserControl x:Class="ShiftManagement.App.Views.ScheduleGenerationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="900">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 制御パネル -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="20" Margin="0,0,0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Year, StringFormat={}{0}年}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Month, StringFormat={}{0}月}" FontSize="18" FontWeight="Bold" Margin="4,0,20,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="勤務表を数理最適化（OR-Tools CP-SAT）で自動計算し、3案を生成します。" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="⚡ 自動生成を開始" Command="{Binding StartGenerationCommand}"
+                            IsEnabled="{Binding IsGenerating, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,10,0"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="中止" Command="{Binding CancelGenerationCommand}"
+                            IsEnabled="{Binding IsGenerating}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- プログレス表示 -->
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <DockPanel Margin="0,0,0,8">
+                    <TextBlock Text="{Binding ProgressMessage}" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding ProgressValue, StringFormat={}{0:F0}%}" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                </DockPanel>
+                <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Height="10"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 結果表示エリア -->
+        <Grid Grid.Row="2">
+            <!-- 成功時: 3案カード -->
+            <StackPanel Visibility="{Binding HasConflictAnalysis, Converter={StaticResource InverseBoolToVis}}">
+                <TextBlock Text="{Binding ResultStatusMessage}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}" Margin="0,0,0,16"/>
+
+                <ItemsControl ItemsSource="{Binding GeneratedCases}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="18" Margin="8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <Border Background="#EFF6FF" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <TextBlock Text="{Binding CaseName}" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                                    </Border>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="総合スコア: " FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding TotalScore, StringFormat={}{0:F1} 点}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding HardViolationCount, StringFormat=Hard違反: {0} 件}" Margin="0,0,0,4" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HardViolationCount}" Value="0">
+                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding SoftViolationCount, StringFormat=Soft未達成: {0} 件}" Margin="0,0,0,4" Foreground="{StaticResource WarningBrush}"/>
+                                    <TextBlock Text="{Binding PersonalWishAchievementRate, StringFormat=希望達成率: {0:F1} %}" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{Binding NightDutyVariance, StringFormat=夜勤回数分散: {0:F2}}" Margin="0,0,0,4" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding SolverTimeSeconds, StringFormat=計算時間: {0:F1} 秒}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- 解なし時: 競合分析と緩和提案 -->
+            <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="8" Padding="20"
+                    Visibility="{Binding HasConflictAnalysis, Converter={StaticResource BoolToVis}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="⚠️ 制約を満たす勤務表を生成できませんでした（解なし）" FontSize="16" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,0,0,12"/>
+                        <TextBlock Text="競合している要因:" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <ItemsControl ItemsSource="{Binding ConflictAnalysis.ConflictDescriptions}" Margin="0,0,0,16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StringFormat=・{0}}" Foreground="{StaticResource DangerBrush}" Margin="0,2"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="推奨される緩和アクション:" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <ItemsControl ItemsSource="{Binding ConflictAnalysis.RelaxationSuggestions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" CornerRadius="4" Padding="10,6" Margin="0,0,0,6" BorderBrush="#FECACA" BorderThickness="1">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding StaffName}" FontWeight="Bold" Margin="0,0,10,0"/>
+                                                <TextBlock Text="{Binding ConstraintDescription}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding RelaxationAction, StringFormat=提案: {0}}" Foreground="{StaticResource PrimaryBrush}" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding ExpectedBenefit, StringFormat=効果: {0}}" FontSize="12" Foreground="{StaticResource SuccessBrush}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

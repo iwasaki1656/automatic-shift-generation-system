@@ -1,0 +1,84 @@
+<UserControl x:Class="ShiftManagement.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 月選択バー -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource SecondaryButton}" Content="◀ 先月" Command="{Binding ChangeMonthCommand}" CommandParameter="-1" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding Year, StringFormat={}{0}年}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Month, StringFormat={}{0}月}" FontSize="20" FontWeight="Bold" Margin="4,0,10,0" VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="翌月 ▶" Command="{Binding ChangeMonthCommand}" CommandParameter="1" Margin="0,0,20,0" />
+                    <TextBlock Text="{Binding FacilityName}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="🔄 更新" Command="{Binding LoadDataCommand}" />
+            </DockPanel>
+        </Border>
+
+        <!-- サマリーカード群 -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,20">
+            <!-- カード 1: ステータス -->
+            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,10,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="勤務表状態" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding ScheduleStatus}" FontSize="18" FontWeight="Bold" Margin="0,8,0,0" Foreground="{StaticResource PrimaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- カード 2: 職員数 -->
+            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="5,0,5,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="登録職員数" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding ActiveStaffCount, StringFormat={}{0} 名}" FontSize="18" FontWeight="Bold" Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- カード 3: 勤務希望数 -->
+            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="5,0,5,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="入力済み希望数" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="必須(Hard): " FontSize="12" Foreground="{StaticResource DangerBrush}" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="{Binding HardConstraintCount}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,0,10,0" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="要望(Soft): " FontSize="12" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="{Binding SoftConstraintCount}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Bottom"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- カード 4: 最新スコア -->
+            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="10,0,0,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="最新採用案スコア" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding LatestScore, StringFormat={}{0:F1} 点}" FontSize="18" FontWeight="Bold" Margin="0,8,0,0" Foreground="{StaticResource SuccessBrush}" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- ガイド・クイックアクション -->
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="24" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="勤務表作成の流れ" FontSize="16" FontWeight="Bold" Margin="0,0,0,16"/>
+                <TextBlock Text="1. 【勤務希望入力】各職員の希望休・勤務不可日・夜勤希望などをカレンダーから入力します。" Margin="0,0,0,10" FontSize="14"/>
+                <TextBlock Text="2. 【勤務表自動生成】OR-Tools数理最適化ソルバーで3つの異なる案を自動計算します。" Margin="0,0,0,10" FontSize="14"/>
+                <TextBlock Text="3. 【3案比較】希望達成率・公平性・夜勤分散などの指標を比較し、最適な案を採用します。" Margin="0,0,0,10" FontSize="14"/>
+                <TextBlock Text="4. 【勤務表詳細・手動修正】必要に応じて微調整を行い、リアルタイム制約チェックを確認します。" Margin="0,0,0,10" FontSize="14"/>
+                <TextBlock Text="5. 【Excel出力】元のフォーマットに忠実なExcelファイルや評価シートを出力・印刷します。" Margin="0,0,0,20" FontSize="14"/>
+
+                <TextBlock Text="ヒント: 左側のサイドバーから各機能へ直接移動できます。" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" FontStyle="Italic"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

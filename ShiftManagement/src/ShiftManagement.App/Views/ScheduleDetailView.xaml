@@ -1,0 +1,100 @@
+<UserControl x:Class="ShiftManagement.App.Views.ScheduleDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ツールバー -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,10" Margin="0,0,0,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Year, StringFormat={}{0}年}" FontWeight="Bold" FontSize="16"/>
+                    <TextBlock Text="{Binding Month, StringFormat={}{0}月}" FontWeight="Bold" FontSize="16" Margin="4,0,16,0"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="再読込" Command="{Binding LoadScheduleCommand}" Margin="0,0,8,0"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="↩ 元に戻す" Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}" Margin="0,0,4,0"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="↪ やり直し" Command="{Binding RedoCommand}" IsEnabled="{Binding CanRedo}" Margin="0,0,16,0"/>
+
+                    <!-- シフト変更用コンボボックス -->
+                    <TextBlock Text="選択セルの勤務変更:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableShiftTypes}" DisplayMemberPath="DisplayName" Width="140"
+                              SelectionChanged="OnShiftTypeSelectionChanged" Margin="0,0,16,0"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="📊 Excel出力（全シート）" Command="{Binding ExportExcelCommand}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- 勤務表グリッド -->
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding GridRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- 職員情報 -->
+                                    <Border Width="80" Padding="4" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Staff.JobType.DisplayName}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    </Border>
+                                    <Border Width="110" Padding="4" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Staff.DisplayName}" FontWeight="SemiBold" FontSize="13"/>
+                                    </Border>
+
+                                    <!-- 日付セル一覧 -->
+                                    <ItemsControl ItemsSource="{Binding Cells}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="30" Height="28" Margin="1" CornerRadius="3"
+                                                        Background="{Binding BackgroundColor, Converter={StaticResource HexToBrush}}"
+                                                        BorderBrush="{Binding HasHardViolation, Converter={StaticResource ViolationToBorder}}"
+                                                        BorderThickness="1"
+                                                        ToolTip="{Binding TooltipText}"
+                                                        MouseLeftButtonDown="OnCellClicked"
+                                                        Cursor="Hand">
+                                                    <TextBlock Text="{Binding DisplaySymbol}" FontWeight="Bold" FontSize="11"
+                                                               Foreground="{Binding FontColor, Converter={StaticResource HexToBrush}}"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- 集計列 -->
+                                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <Border Width="36" Padding="2"><TextBlock Text="{Binding OffCount, StringFormat=休:{0}}" FontSize="10"/></Border>
+                                        <Border Width="36" Padding="2"><TextBlock Text="{Binding NightCount, StringFormat=夜:{0}}" FontSize="10"/></Border>
+                                        <Border Width="36" Padding="2"><TextBlock Text="{Binding DayCount, StringFormat=日:{0}}" FontSize="10"/></Border>
+                                        <Border Width="45" Padding="2"><TextBlock Text="{Binding WorkloadScore, StringFormat={}{0:F0}pt}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource PrimaryLightBrush}"/></Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 下部ステータスバー -->
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12,8" Margin="0,10,0,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="{Binding ValidationSummary}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,93 @@
+## ========================================================
+## .NET / Visual Studio / C#
+## ========================================================
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+publish/
+
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# Build and Test Results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.visualstate
+
+# Package files
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## ========================================================
+## アプリケーション固有データ・ローカルストレージ
+## ========================================================
+# SQLite データベース
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# バックアップフォルダ
+[Bb]ackup/
+[Bb]ackups/
+
+# ログファイル
+*.log
+
+# Excel 一時ファイル (編集時にOfficeが生成する隠しファイル)
+~$*.xlsx
+~$*.xls
+~$*.xlsm
+
+## ========================================================
+## OS 固有ファイル
+## ========================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/

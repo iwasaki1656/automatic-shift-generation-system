@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>ShiftManagement.App</RootNamespace>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <AssemblyTitle>勤務表自動作成システム</AssemblyTitle>
+    <Company>ライフステイむなかた</Company>
+    <Product>勤務表自動作成システム</Product>
+    <Description>介護施設・看護施設向け勤務表自動作成システム</Description>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="Templates\Template.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShiftManagement.Core\ShiftManagement.Core.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Data\ShiftManagement.Data.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Infrastructure\ShiftManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Optimization\ShiftManagement.Optimization.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Validation\ShiftManagement.Validation.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Excel\ShiftManagement.Excel.csproj" />
+  </ItemGroup>
+</Project>
