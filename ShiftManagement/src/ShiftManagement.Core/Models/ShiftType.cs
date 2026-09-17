@@ -20,6 +20,13 @@ public class ShiftType
     /// <summary>勤務カテゴリ</summary>
     public ShiftCategory Category { get; set; }
 
+    /// <summary>勤務カテゴリ（エイリアス）</summary>
+    public ShiftCategory ShiftCategory
+    {
+        get => Category;
+        set => Category = value;
+    }
+
     /// <summary>負担度（公平性計算用）</summary>
     public double LoadFactor { get; set; } = 1.0;
 

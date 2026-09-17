@@ -76,6 +76,7 @@ public class ShiftDbContext : DbContext
             e.HasIndex(x => x.Code).IsUnique();
             e.Ignore(x => x.IsDayOff);
             e.Ignore(x => x.IsNightRelated);
+            e.Ignore(x => x.ShiftCategory);
         });
 
         // ShiftRequirement

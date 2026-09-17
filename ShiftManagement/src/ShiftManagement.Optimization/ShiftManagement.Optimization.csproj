@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShiftManagement.Core\ShiftManagement.Core.csproj" />
+    <ProjectReference Include="..\ShiftManagement.Validation\ShiftManagement.Validation.csproj" />
   </ItemGroup>
 </Project>

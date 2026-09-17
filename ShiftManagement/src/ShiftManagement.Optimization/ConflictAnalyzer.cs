@@ -1,3 +1,4 @@
+using ShiftManagement.Core.Interfaces;
 using ShiftManagement.Core.Models;
 
 namespace ShiftManagement.Optimization;
