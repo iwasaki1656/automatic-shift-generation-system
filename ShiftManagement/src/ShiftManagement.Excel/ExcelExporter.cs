@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
+using ShiftManagement.Core.Interfaces;
 using ShiftManagement.Core.Models;
-using ShiftManagement.Validation;
 
 namespace ShiftManagement.Excel;
 
